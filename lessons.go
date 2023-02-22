@@ -1,8 +1,9 @@
 package main
 
 import (
+	"encoding/json"
+	"os"
 	"fmt"
-	"enconding/json"
 )
 
 func main() {
@@ -46,6 +47,8 @@ func lessons() {
 	lessonThirtyTwo()
 	lessonThirtyThree()
 	lessonThirtyFour()
+	lessonThirtyFive()
+	lessonThirtySix()
 }
 
 func exercices() {
@@ -790,10 +793,11 @@ func onlySumPairNumbers(f func(values ...int) int, pair ...int) int {
 	fmt.Printf("O valor de y dentro da função é: %d\n", *y)
  }
 
+
  func lessonThirtyThree() {
 
 	//qual a diferença afinal?
-	// sempre wque o valor "original" pecisar ser mantido, não use ponteiro, mas quando o valor 
+	// sempre que o valor "original" pecisar ser mantido, não use ponteiro, mas quando o valor 
 	//"original" puder mudar, use
 	fmt.Println("\nLesson Thirty Three")
 
@@ -807,43 +811,92 @@ func onlySumPairNumbers(f func(values ...int) int, pair ...int) int {
  }
 
  //transformar struct em json
+
+ //struct tem q ter letra maiuscula p ser exportada e visivel p outros pacotes
+ //o mesmo serve para as props
 type Category struct {
-	name string
+	Name string
 }
 
 type Product struct {
-	name string
-	unitValue float64
-	brand Brand
-	category []Category
+	Name string
+	UnitValue float64
+	Brand Brand
+	Category Category
 }
 
  type Brand struct {
-	name string
+	Name string
  }
 
  func lessonThirtyFour() {
 	fmt.Println("\nLesson Thirty Four")
 
 	pasta := Product {
-		name: "Spaghetti",
-		unitValue: 3.59,
-		brand: "Liza",
-		category: [
+		Name: "Spaghetti",
+		UnitValue: 3.59,
+		Brand: Brand {"Liza"},
+		Category: Category {
 			"Food",
-			"Pasta"
-		]
+		},
 	}
 
 	fmt.Println("A struct criada foi ", pasta)
 
-	bytJson, err := json.Marshal(pasta)
+	byteJson, err := json.Marshal(pasta)
 
 	if err != nil {
 		fmt.Println("Algo deu errado: ", err)
 	}else {
-		fmt.Println("O json gerado dessa struct foi ", bytJson)
+		fmt.Print("O json gerado foi: ")
+		fmt.Print(string(byteJson))
+		fmt.Print("\n") 
 	}
+ }
+
+ //JSON to struct
+ func lessonThirtyFive() {
+	fmt.Println("\nLesson Thirty Five")
+
+	sliceOfBytes := []byte(`{"Name":"Spaghetti","UnitValue":3.59,"Brand":{"Name":"Liza"},"Category":{"Name":"Food"}}`)
+
+	type Product struct {
+		Name      string  `json:"Name"` //`json:Name` é uma tag para dizer que a prop Name do json será Name tbm na struct
+		UnitValue float64 `json:"UnitValue"`
+		Brand     struct {
+			Name string `json:"Name"`
+		} `json:"Brand"`
+		Category struct {
+			Name string `json:"Name"`
+		} `json:"Category"`
+	}
+
+	var pasta Product
+
+	err := json.Unmarshal(sliceOfBytes, &pasta)
+
+	if err != nil { fmt.Println("Erro: ", err) }
+	fmt.Println(pasta)
+ }
+
+ //criando Enconder JSON
+ func lessonThirtySix() {
+	fmt.Println("\nLesson Thirty Six")
+
+	pasta := Product {
+		Name: "Spaghetti",
+		UnitValue: 3.59,
+		Brand: Brand {"Liza"},
+		Category: Category {
+			"Food",
+		},
+	}
+
+	fmt.Println("Struct pasta: ", pasta)
+
+	//os.Stout já ira converter o valor da struct e tocar na tela (os.Stdout)
+	encoder := json.NewEncoder(os.Stdout)
+	encoder.Encode(pasta)
  }
 
 func exerciceOne() {
